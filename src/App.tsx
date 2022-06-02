@@ -48,20 +48,35 @@ const App = () => {
   
   const handleAddToCart = (clickedItem: CartItemType) => {
     setCartItems(prev => {
-      const isItemInCart = prev.find(items => items.id === clickedItem.id)
+
+      // Is the item already added into the cart? :
+      const isItemInCart = prev.find(item => item.id === clickedItem.id)
 
       if (isItemInCart) {
-        return prev.map(items => 
-          items.id === clickedItem.id
-            ? { ...items, amount: items.amount + 1 }
-            : items
+        return prev.map(item => 
+          item.id === clickedItem.id
+            ? { ...item, amount: item.amount + 1 }
+            : item
         );
       }
+
+      // when the item is added for the first time:
       return [...prev, { ...clickedItem, amount: 1 }]
     })
   };
 
-  const handleRemoveFromCart = () => null;
+  const handleRemoveFromCart = (id: number) => {
+    setCartItems(prev => (
+      prev.reduce((ack, item) => {
+        if (item.id === id) {
+          if (item.amount === 1) return ack;
+          return [...ack, { ...item, amount: item.amount - 1 }];
+        } else {
+          return [...ack, item];
+        }
+      }, [] as CartItemType[])
+    ))
+  }
 
 
   if (isLoading) return <LinearProgress />;
